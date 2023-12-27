@@ -14,19 +14,42 @@ Additional Features of HFTDEX
 
 ## HFTDEX Architecture
 
-1. **Orderbook Contract**: Manages the limit orders, storing the buy and sell orders in sorted data structures to facilitate quick matching.
+### Core
 
-2. **Trade Executor Contract**: Responsible for matching buy and sell orders from the order book and executing trades.
+Orderbook Contracts.
 
-3. **Margin Account Contract**: Handles margin accounts for each trader, tracking deposited collateral, borrowed funds, and managing liquidations as necessary.
+1. **Orderbook Contract**: Orderbook for a token pair.
+2. **OrderbookFactory**: Orderbook deployer for token pairs. Planned Pairs:
+   * WETH
+   * USDC
+   * USDT
+   * BTC
+   * USDP
+   * DAI
+   * BUSD
+   * UST
+   * BNB
+   * TUSD
+   * UNI
+   * AAVE
+   * LINK
+   * SOL
+   * NEAR
+   * HBAR
+   * AVAX
+   * MATIC
+   * LTC
+   * ICP
 
-4. **Collateral Management Contract**: Controls the collateral posted by users, ensuring that it is sufficient for the leverage provided and handling collateral updates.
+### Leveraged Trading Contracts
 
-5. **Pricing Oracle Contract**: Integrates with external or internal oracles to provide real-time price feeds for accurate margin and liquidation calculations.
+1. **MarginAccount**: To manage individual trader's margin accounts, tracking the amounts borrowed and the associated liabilities.
 
-6. **Leverage Management Contract**: Sets the rules for maximum leverage allowed, calculates required collateral, and enforces leverage limits.
+2. **LendingPool and LendingPoolFactory**: To facilitate the lending of assets. This pool can be funded by other users who earn interest on their lent assets.
 
+3. **Liquidation Contract**: To handle the liquidation of positions that fall below a certain maintenance margin, ensuring lenders are repaid.
 
+4. **Oracle**: To provide reliable price feeds which are crucial for calculating the value of collateral and triggering liquidations.
 
 ## Order Types
 
