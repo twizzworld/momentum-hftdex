@@ -1,5 +1,33 @@
+/*
+███╗░░░███╗░█████╗░███╗░░░███╗███████╗███╗░░██╗████████╗██╗░░░██╗███╗░░░███╗
+████╗░████║██╔══██╗████╗░████║██╔════╝████╗░██║╚══██╔══╝██║░░░██║████╗░████║
+██╔████╔██║██║░░██║██╔████╔██║█████╗░░██╔██╗██║░░░██║░░░██║░░░██║██╔████╔██║
+██║╚██╔╝██║██║░░██║██║╚██╔╝██║██╔══╝░░██║╚████║░░░██║░░░██║░░░██║██║╚██╔╝██║
+██║░╚═╝░██║╚█████╔╝██║░╚═╝░██║███████╗██║░╚███║░░░██║░░░╚██████╔╝██║░╚═╝░██║
+╚═╝░░░░░╚═╝░╚════╝░╚═╝░░░░░╚═╝╚══════╝╚═╝░░╚══╝░░░╚═╝░░░░╚═════╝░╚═╝░░░░░╚═╝
+
+██╗░░██╗███████╗████████╗██████╗░███████╗██╗░░██╗
+██║░░██║██╔════╝╚══██╔══╝██╔══██╗██╔════╝╚██╗██╔╝
+███████║█████╗░░░░░██║░░░██║░░██║█████╗░░░╚███╔╝░
+██╔══██║██╔══╝░░░░░██║░░░██║░░██║██╔══╝░░░██╔██╗░
+██║░░██║██║░░░░░░░░██║░░░██████╔╝███████╗██╔╝╚██╗
+╚═╝░░╚═╝╚═╝░░░░░░░░╚═╝░░░╚═════╝░╚══════╝╚═╝░░╚═╝
+*/
+
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
+
+/*
+ * @title PriceOracle
+ * @author twizzwrld
+ *
+ * The PriceOracle contract interacts with the Razor Network Oracle to fetch price feeds for various assets.
+ *
+ * This contract serves as a bridge between the Ethereum Virtual Machine (EVM)-compatible chains and the Razor Schain,
+ * allowing decentralized applications (DApps) on Ethereum to access real-time price data provided by Razor Network.
+ *
+ * @notice This contract provides functions to fetch and calculate asset prices based on the Razor Network Oracle's data.
+ */
 
 interface ITransparentForwarder {
     function getResult(bytes32 _name) external payable returns (uint256, int8);

@@ -1,5 +1,30 @@
+/*
+███╗░░░███╗░█████╗░███╗░░░███╗███████╗███╗░░██╗████████╗██╗░░░██╗███╗░░░███╗
+████╗░████║██╔══██╗████╗░████║██╔════╝████╗░██║╚══██╔══╝██║░░░██║████╗░████║
+██╔████╔██║██║░░██║██╔████╔██║█████╗░░██╔██╗██║░░░██║░░░██║░░░██║██╔████╔██║
+██║╚██╔╝██║██║░░██║██║╚██╔╝██║██╔══╝░░██║╚████║░░░██║░░░██║░░░██║██║╚██╔╝██║
+██║░╚═╝░██║╚█████╔╝██║░╚═╝░██║███████╗██║░╚███║░░░██║░░░╚██████╔╝██║░╚═╝░██║
+╚═╝░░░░░╚═╝░╚════╝░╚═╝░░░░░╚═╝╚══════╝╚═╝░░╚══╝░░░╚═╝░░░░╚═════╝░╚═╝░░░░░╚═╝
+
+██╗░░██╗███████╗████████╗██████╗░███████╗██╗░░██╗
+██║░░██║██╔════╝╚══██╔══╝██╔══██╗██╔════╝╚██╗██╔╝
+███████║█████╗░░░░░██║░░░██║░░██║█████╗░░░╚███╔╝░
+██╔══██║██╔══╝░░░░░██║░░░██║░░██║██╔══╝░░░██╔██╗░
+██║░░██║██║░░░░░░░░██║░░░██████╔╝███████╗██╔╝╚██╗
+╚═╝░░╚═╝╚═╝░░░░░░░░╚═╝░░░╚═════╝░╚══════╝╚═╝░░╚═╝
+*/
+
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
+
+/*
+ * @title LendingPool
+ * @author twizzwrld
+ *
+ * The LendingPool contract represents a lending pool for a specific token. It allows users to deposit tokens into the pool to earn interest and withdraw their deposited tokens with earned interest. The interest rate is set annually and is calculated based on the deposited amount.
+ *
+ * @notice This contract is designed to provide lending services for a specific ERC-20 token.
+ */
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";

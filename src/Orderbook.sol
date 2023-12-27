@@ -21,6 +21,21 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
+/**
+ * @title OrderBook for Token Exchange
+ * @author twizzwrld
+ *
+ * This contract serves as a decentralized exchange order book, facilitating the trading of two ERC20 tokens.
+ * It operates on a model where traders can place limit orders to buy or sell tokens at specified prices.
+ * The contract maintains separate lists for buy and sell orders and matches them based on price and time priority,
+ * aiming to keep a fair and orderly market.
+ *
+ * @notice The OrderBook contract supports limit order placements and automatic order matching.
+ * It allows traders to specify the amount and price at which they wish to trade, creating an environment
+ * similar to traditional market maker models but in a trustless, decentralized setting.
+ * The contract handles token transfers directly, ensuring that trades are settled immediately upon matching.
+ */
+
 contract OrderBook {
     using SafeMath for uint256;
 

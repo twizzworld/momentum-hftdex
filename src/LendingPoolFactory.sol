@@ -1,5 +1,30 @@
+/*
+███╗░░░███╗░█████╗░███╗░░░███╗███████╗███╗░░██╗████████╗██╗░░░██╗███╗░░░███╗
+████╗░████║██╔══██╗████╗░████║██╔════╝████╗░██║╚══██╔══╝██║░░░██║████╗░████║
+██╔████╔██║██║░░██║██╔████╔██║█████╗░░██╔██╗██║░░░██║░░░██║░░░██║██╔████╔██║
+██║╚██╔╝██║██║░░██║██║╚██╔╝██║██╔══╝░░██║╚████║░░░██║░░░██║░░░██║██║╚██╔╝██║
+██║░╚═╝░██║╚█████╔╝██║░╚═╝░██║███████╗██║░╚███║░░░██║░░░╚██████╔╝██║░╚═╝░██║
+╚═╝░░░░░╚═╝░╚════╝░╚═╝░░░░░╚═╝╚══════╝╚═╝░░╚══╝░░░╚═╝░░░░╚═════╝░╚═╝░░░░░╚═╝
+
+██╗░░██╗███████╗████████╗██████╗░███████╗██╗░░██╗
+██║░░██║██╔════╝╚══██╔══╝██╔══██╗██╔════╝╚██╗██╔╝
+███████║█████╗░░░░░██║░░░██║░░██║█████╗░░░╚███╔╝░
+██╔══██║██╔══╝░░░░░██║░░░██║░░██║██╔══╝░░░██╔██╗░
+██║░░██║██║░░░░░░░░██║░░░██████╔╝███████╗██╔╝╚██╗
+╚═╝░░╚═╝╚═╝░░░░░░░░╚═╝░░░╚═════╝░╚══════╝╚═╝░░╚═╝
+*/
+
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
+
+/*
+ * @title LendingPoolFactory
+ * @author twizzwrld
+ *
+ * The LendingPoolFactory contract is a factory for creating LendingPool contracts. Each LendingPool represents a lending pool for a specific token and manages lending activities for that token.
+ *
+ * @notice This contract allows for the creation of multiple LendingPool instances, each associated with a specific token and annual interest rate.
+ */
 
 import "./LendingPool.sol";
 

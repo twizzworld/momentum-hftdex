@@ -1,5 +1,32 @@
+/*
+███╗░░░███╗░█████╗░███╗░░░███╗███████╗███╗░░██╗████████╗██╗░░░██╗███╗░░░███╗
+████╗░████║██╔══██╗████╗░████║██╔════╝████╗░██║╚══██╔══╝██║░░░██║████╗░████║
+██╔████╔██║██║░░██║██╔████╔██║█████╗░░██╔██╗██║░░░██║░░░██║░░░██║██╔████╔██║
+██║╚██╔╝██║██║░░██║██║╚██╔╝██║██╔══╝░░██║╚████║░░░██║░░░██║░░░██║██║╚██╔╝██║
+██║░╚═╝░██║╚█████╔╝██║░╚═╝░██║███████╗██║░╚███║░░░██║░░░╚██████╔╝██║░╚═╝░██║
+╚═╝░░░░░╚═╝░╚════╝░╚═╝░░░░░╚═╝╚══════╝╚═╝░░╚══╝░░░╚═╝░░░░╚═════╝░╚═╝░░░░░╚═╝
+
+██╗░░██╗███████╗████████╗██████╗░███████╗██╗░░██╗
+██║░░██║██╔════╝╚══██╔══╝██╔══██╗██╔════╝╚██╗██╔╝
+███████║█████╗░░░░░██║░░░██║░░██║█████╗░░░╚███╔╝░
+██╔══██║██╔══╝░░░░░██║░░░██║░░██║██╔══╝░░░██╔██╗░
+██║░░██║██║░░░░░░░░██║░░░██████╔╝███████╗██╔╝╚██╗
+╚═╝░░╚═╝╚═╝░░░░░░░░╚═╝░░░╚═════╝░╚══════╝╚═╝░░╚═╝
+*/
+
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
+
+/*
+ * @title MarginAccount
+ * @author twizzwrld
+ *
+ * The MarginAccount contract serves as the core of a decentralized margin trading system. It enables users to deposit, withdraw, borrow, and repay assets for margin trading.
+ *
+ * This contract operates with a designated trading token and interacts with a lending pool contract for borrowing and liquidation purposes.
+ *
+ * @notice This contract is designed to provide a margin trading platform where users can leverage their deposits for trading activities.
+ */
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
