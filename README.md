@@ -12,6 +12,22 @@ Additional Features of HFTDEX
 * Leveraged trading
 * Liquidity Pools & Arbitrage
 
+## HFTDEX Architecture
+
+1. **Orderbook Contract**: Manages the limit orders, storing the buy and sell orders in sorted data structures to facilitate quick matching.
+
+2. **Trade Executor Contract**: Responsible for matching buy and sell orders from the order book and executing trades.
+
+3. **Margin Account Contract**: Handles margin accounts for each trader, tracking deposited collateral, borrowed funds, and managing liquidations as necessary.
+
+4. **Collateral Management Contract**: Controls the collateral posted by users, ensuring that it is sufficient for the leverage provided and handling collateral updates.
+
+5. **Pricing Oracle Contract**: Integrates with external or internal oracles to provide real-time price feeds for accurate margin and liquidation calculations.
+
+6. **Leverage Management Contract**: Sets the rules for maximum leverage allowed, calculates required collateral, and enforces leverage limits.
+
+
+
 ## Order Types
 
 Advanced order types are crucial in trading platforms, especially for sophisticated trading strategies. Here's a list of the order types:
@@ -36,17 +52,5 @@ Advanced order types are crucial in trading platforms, especially for sophistica
 
 These advanced order types enable traders to implement complex trading strategies and manage risk more effectively in volatile markets.
 
-## HFTDEX Architecture
 
-1. **Orderbook Contract**: Manages the limit orders, storing the buy and sell orders in sorted data structures to facilitate quick matching.
-
-2. **Trade Executor Contract**: Responsible for matching buy and sell orders from the order book and executing trades.
-
-3. **Margin Account Contract**: Handles margin accounts for each trader, tracking deposited collateral, borrowed funds, and managing liquidations as necessary.
-
-4. **Collateral Management Contract**: Controls the collateral posted by users, ensuring that it is sufficient for the leverage provided and handling collateral updates.
-
-5. **Pricing Oracle Contract**: Integrates with external or internal oracles to provide real-time price feeds for accurate margin and liquidation calculations.
-
-6. **Leverage Management Contract**: Sets the rules for maximum leverage allowed, calculates required collateral, and enforces leverage limits.
 
