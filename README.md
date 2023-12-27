@@ -1,66 +1,52 @@
-## Foundry
+# Momentum HFTDEX
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+An Orderbook DEX with support for High Frequency Trading.
 
-Foundry consists of:
+Components of an Orderbook DEX:
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+* Order Types
+* Matching Engine
 
-## Documentation
+Additional Features of HFTDEX
 
-https://book.getfoundry.sh/
+* Leveraged trading
+* Liquidity Pools & Arbitrage
 
-## Usage
+## Order Types
 
-### Build
+Advanced order types are crucial in trading platforms, especially for sophisticated trading strategies. Here's a list of the order types:
 
-```shell
-$ forge build
-```
+1. **Limit Order**: An order to buy or sell an asset at a specified price or better.
 
-### Test
+2. **Market Order**: An order to buy or sell an asset immediately at the best available current price.
 
-```shell
-$ forge test
-```
+3. **Stop Order (Stop Loss)**: An order to buy or sell an asset once the price of the asset reaches a specified price, known as the stop price.
 
-### Format
+4. **Stop Limit Order**: Combines a stop order with a limit order. Once the stop price is reached, a limit order is triggered to buy/sell at a specific price or better.
 
-```shell
-$ forge fmt
-```
+5. **Trailing Stop Order**: Similar to a stop order, but the stop price trails the market price of the asset by a specified distance.
 
-### Gas Snapshots
+6. **Iceberg Order**: A large order that has been divided into smaller lots, hidden except for a small portion of the total order to mask the actual order quantity.
 
-```shell
-$ forge snapshot
-```
+7. **Bracket Order**: A three-component order where an initial order (like a limit order) is placed along with two additional instructions for a stop loss and a take profit order.
 
-### Anvil
+8. **Good 'Til Canceled (GTC)**: An order to buy or sell at a set price that remains active until the investor cancels it or the trade is executed.
 
-```shell
-$ anvil
-```
+9. **Day Order**: An order that expires if not executed by the end of the trading day.
 
-### Deploy
+These advanced order types enable traders to implement complex trading strategies and manage risk more effectively in volatile markets.
 
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
+## HFTDEX Architecture
 
-### Cast
+1. **Orderbook Contract**: Manages the limit orders, storing the buy and sell orders in sorted data structures to facilitate quick matching.
 
-```shell
-$ cast <subcommand>
-```
+2. **Trade Executor Contract**: Responsible for matching buy and sell orders from the order book and executing trades.
 
-### Help
+3. **Margin Account Contract**: Handles margin accounts for each trader, tracking deposited collateral, borrowed funds, and managing liquidations as necessary.
 
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+4. **Collateral Management Contract**: Controls the collateral posted by users, ensuring that it is sufficient for the leverage provided and handling collateral updates.
+
+5. **Pricing Oracle Contract**: Integrates with external or internal oracles to provide real-time price feeds for accurate margin and liquidation calculations.
+
+6. **Leverage Management Contract**: Sets the rules for maximum leverage allowed, calculates required collateral, and enforces leverage limits.
+
