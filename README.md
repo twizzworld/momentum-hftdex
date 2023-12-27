@@ -54,7 +54,12 @@ Orderbook Contracts.
 ## Order Types
 
 Status: To be Implemented.
-Notes: HFTDEX currently supports only limit orders. However, Momentum plans to make advanced order types available through the [frontend](https://github.com/twizzworld/hftdex-frontend). Traders can also make their own custom order types through utilizing the [API](https://github.com/twizzworld/hftdex-api). 
+
+Notes: HFTDEX currently supports only limit orders. 
+
+However, Momentum plans to make advanced order types available through the [frontend](https://github.com/twizzworld/hftdex-frontend). 
+
+Traders can also make their own custom order types through utilizing the [API](https://github.com/twizzworld/hftdex-api). 
 
 Advanced order types are crucial in trading platforms, especially for sophisticated trading strategies. Here's a list of the order types:
 
