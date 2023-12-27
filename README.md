@@ -19,7 +19,9 @@ Additional Features of HFTDEX
 Orderbook Contracts.
 
 1. **Orderbook Contract**: Orderbook for a token pair.
-2. **OrderbookFactory**: Orderbook deployer for token pairs. Planned Pairs:
+2. **OrderbookFactory**: Orderbook deployer for token pairs.
+
+Tentative Supported Tokens:
    * WETH
    * USDC
    * USDT
