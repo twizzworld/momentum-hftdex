@@ -1,19 +1,3 @@
-/*
-███╗░░░███╗░█████╗░███╗░░░███╗███████╗███╗░░██╗████████╗██╗░░░██╗███╗░░░███╗
-████╗░████║██╔══██╗████╗░████║██╔════╝████╗░██║╚══██╔══╝██║░░░██║████╗░████║
-██╔████╔██║██║░░██║██╔████╔██║█████╗░░██╔██╗██║░░░██║░░░██║░░░██║██╔████╔██║
-██║╚██╔╝██║██║░░██║██║╚██╔╝██║██╔══╝░░██║╚████║░░░██║░░░██║░░░██║██║╚██╔╝██║
-██║░╚═╝░██║╚█████╔╝██║░╚═╝░██║███████╗██║░╚███║░░░██║░░░╚██████╔╝██║░╚═╝░██║
-╚═╝░░░░░╚═╝░╚════╝░╚═╝░░░░░╚═╝╚══════╝╚═╝░░╚══╝░░░╚═╝░░░░╚═════╝░╚═╝░░░░░╚═╝
-
-██╗░░██╗███████╗████████╗██████╗░███████╗██╗░░██╗
-██║░░██║██╔════╝╚══██╔══╝██╔══██╗██╔════╝╚██╗██╔╝
-███████║█████╗░░░░░██║░░░██║░░██║█████╗░░░╚███╔╝░
-██╔══██║██╔══╝░░░░░██║░░░██║░░██║██╔══╝░░░██╔██╗░
-██║░░██║██║░░░░░░░░██║░░░██████╔╝███████╗██╔╝╚██╗
-╚═╝░░╚═╝╚═╝░░░░░░░░╚═╝░░░╚═════╝░╚══════╝╚═╝░░╚═╝
-*/
-
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
@@ -42,12 +26,6 @@ contract CLOBOrderBookDEX {
         uint256 icebergVisibleAmount;
     }
 
-    struct Trade {
-        uint256 amountToken1;
-        uint256 amountToken2;
-        uint256 timestamp;
-    }
-
     address public token1;
     address public token2;
     uint256 public nextOrderId = 1;
@@ -56,10 +34,6 @@ contract CLOBOrderBookDEX {
     uint256[] private sellOrderIds;
     PriceOracle public priceOracle;
     address private owner;
-    Trade[] private trades; // Array to store trade data for VWAP calculation
-    uint256 public vwapPrice; // VWAP price
-    uint256 public currentVWAP;
-
 
     event OrderPlaced(uint256 orderId, address trader, uint256 amountToken1, uint256 amountToken2, bool isBuyOrder);
     event TradeExecuted(uint256 buyOrderId, uint256 sellOrderId, uint256 tradedAmountToken1, uint256 tradedAmountToken2);
@@ -69,8 +43,6 @@ contract CLOBOrderBookDEX {
     event IcebergOrderPlaced(uint256 orderId, address trader, uint256 totalAmountToken1, uint256 totalAmountToken2, uint256 visibleAmountToken1, bool isBuyOrder);
     event OrderActivated(uint256 orderId);
     event OrderCancelled(uint256 orderId);
-    event VWAPUpdated(uint256 newVWAP);
-
 
     constructor(address _token1, address _token2) {
         token1 = _token1;
@@ -189,26 +161,6 @@ contract CLOBOrderBookDEX {
         return orders[orderId];
     }
 
-    function updateVWAP() internal {
-        uint256 volumeWeightedSum = 0;
-        uint256 totalVolume = 0;
-        uint256 twentyFourHoursAgo = block.timestamp - 24 hours;
-
-        for (uint i = trades.length; i > 0; i--) {
-            Trade storage trade = trades[i - 1];
-            if (trade.timestamp < twentyFourHoursAgo) break;
-
-            volumeWeightedSum += trade.amountToken1 * trade.amountToken2;
-            totalVolume += trade.amountToken1;
-        }
-
-        if (totalVolume > 0) {
-            currentVWAP = volumeWeightedSum / totalVolume;
-        } else {
-            currentVWAP = 0;
-        }
-    }
-
     function triggerUpdateOrderStates() external onlyOwner {
         uint256 currentMarketPrice = priceOracle.calculatePrice();
         updateOrderStates(currentMarketPrice);
@@ -312,13 +264,6 @@ contract CLOBOrderBookDEX {
         require(IERC20(token1).transferFrom(sellOrder.trader, buyOrder.trader, tradeAmountToken1), "Token1 transfer failed");
         require(IERC20(token2).transferFrom(buyOrder.trader, sellOrder.trader, tradeAmountToken2), "Token2 transfer failed");
 
-        // Record the trade for VWAP calculation
-        trades.push(Trade({
-            amountToken1: tradeAmountToken1,
-            amountToken2: tradeAmountToken2,
-            timestamp: block.timestamp
-        }));
-
         updateOrder(buyOrder, tradeAmountToken1, tradeAmountToken2, buyOrderId);
         updateOrder(sellOrder, tradeAmountToken1, tradeAmountToken2, sellOrderId);
 
@@ -330,9 +275,6 @@ contract CLOBOrderBookDEX {
         }
 
         emit TradeExecuted(buyOrderId, sellOrderId, tradeAmountToken1, tradeAmountToken2);
-
-        // Update VWAP after each trade
-        updateVWAP();
     }
 
     function updateOrder(Order storage order, uint256 tradeAmountToken1, uint256 tradeAmountToken2, uint256 orderId) internal {
