@@ -1,3 +1,19 @@
+```
+███╗░░░███╗░█████╗░███╗░░░███╗███████╗███╗░░██╗████████╗██╗░░░██╗███╗░░░███╗
+████╗░████║██╔══██╗████╗░████║██╔════╝████╗░██║╚══██╔══╝██║░░░██║████╗░████║
+██╔████╔██║██║░░██║██╔████╔██║█████╗░░██╔██╗██║░░░██║░░░██║░░░██║██╔████╔██║
+██║╚██╔╝██║██║░░██║██║╚██╔╝██║██╔══╝░░██║╚████║░░░██║░░░██║░░░██║██║╚██╔╝██║
+██║░╚═╝░██║╚█████╔╝██║░╚═╝░██║███████╗██║░╚███║░░░██║░░░╚██████╔╝██║░╚═╝░██║
+╚═╝░░░░░╚═╝░╚════╝░╚═╝░░░░░╚═╝╚══════╝╚═╝░░╚══╝░░░╚═╝░░░░╚═════╝░╚═╝░░░░░╚═╝
+
+███╗░░░███╗░█████╗░██████╗░██╗░░██╗███████╗████████╗░██████╗
+████╗░████║██╔══██╗██╔══██╗██║░██╔╝██╔════╝╚══██╔══╝██╔════╝
+██╔████╔██║███████║██████╔╝█████═╝░█████╗░░░░░██║░░░╚█████╗░
+██║╚██╔╝██║██╔══██║██╔══██╗██╔═██╗░██╔══╝░░░░░██║░░░░╚═══██╗
+██║░╚═╝░██║██║░░██║██║░░██║██║░╚██╗███████╗░░░██║░░░██████╔╝
+╚═╝░░░░░╚═╝╚═╝░░╚═╝╚═╝░░╚═╝╚═╝░░╚═╝╚══════╝░░░╚═╝░░░╚═════╝░
+```
+
 # Momentum HFTDEX
 
 An Orderbook DEX with support for High Frequency Trading.
@@ -19,7 +35,9 @@ Additional Features of HFTDEX
 Orderbook Contracts.
 
 1. **Orderbook Contract**: Orderbook for a token pair.
-2. **OrderbookFactory**: Orderbook deployer for token pairs. Planned Pairs:
+2. **OrderbookFactory**: Orderbook deployer for token pairs.
+
+Tentative Supported Tokens:
    * WETH
    * USDC
    * USDT
@@ -52,6 +70,14 @@ Orderbook Contracts.
 4. **Oracle**: To provide reliable price feeds which are crucial for calculating the value of collateral and triggering liquidations.
 
 ## Order Types
+
+Status: To be Implemented.
+
+Notes: HFTDEX currently supports only limit orders. 
+
+However, Momentum plans to make advanced order types available through the [frontend](https://github.com/twizzworld/hftdex-frontend). 
+
+Traders can also make their own custom order types through utilizing the [API](https://github.com/twizzworld/hftdex-api). 
 
 Advanced order types are crucial in trading platforms, especially for sophisticated trading strategies. Here's a list of the order types:
 
