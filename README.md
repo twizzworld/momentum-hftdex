@@ -37,7 +37,7 @@ Orderbook Contracts.
 1. **Orderbook Contract**: Orderbook for a token pair.
 2. **OrderbookFactory**: Orderbook deployer for token pairs.
 
-Tentative Planned Tokens:
+Tentative Token List:
 ```
    * WETH
    * USDC
