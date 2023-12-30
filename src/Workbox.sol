@@ -71,7 +71,7 @@ contract CLOBOrderBookDEX {
         }
 
         emit OrderPlaced(orderId, msg.sender, amountToken1, amountToken2, isBuyOrder);
-        matchOrders();
+        //matchOrders();
     }
 
     function placeLimitOrder(uint256 amountToken1, uint256 amountToken2, uint256 limitPrice, bool isBuyOrder) external {
@@ -85,7 +85,7 @@ contract CLOBOrderBookDEX {
         }
 
         emit OrderPlaced(orderId, msg.sender, amountToken1, amountToken2, isBuyOrder);
-        matchOrders();
+        //matchOrders();
     }
 
         function placeStopOrder(uint256 amountToken1, uint256 amountToken2, uint256 stopPrice, bool isBuyOrder) external {
