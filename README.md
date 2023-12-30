@@ -38,6 +38,7 @@ Orderbook Contracts.
 2. **OrderbookFactory**: Orderbook deployer for token pairs.
 
 Tentative Supported Tokens:
+```
    * WETH
    * USDC
    * USDT
@@ -58,7 +59,7 @@ Tentative Supported Tokens:
    * MATIC
    * LTC
    * ICP
-
+```
 ### Leveraged Trading Contracts
 
 1. **MarginAccount**: To manage individual trader's margin accounts, tracking the amounts borrowed and the associated liabilities.
@@ -74,14 +75,14 @@ Tentative Supported Tokens:
 Status: To be Implemented.
 
 HFTDEX currently supports:
-
+```
 1. Market Orders
 2. Limit Orders
 3. Stop Orders
 4. Stop Limit Orders
 5. Trailing Stop Orders
 6. Iceberg Orders
-
+```
 Momentum plans to make more advanced order types available through the frontend. 
 
 Traders can also make their own custom order types through utilizing the API.  
