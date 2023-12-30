@@ -13,4 +13,6 @@ docs/
 # Dotenv file
 .env
 
-src/workshop
+src/Workbox.sol
+
+todo.txt

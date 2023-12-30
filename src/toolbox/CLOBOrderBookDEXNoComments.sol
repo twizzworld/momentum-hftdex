@@ -1,9 +1,29 @@
+/*
+███╗░░░███╗░█████╗░███╗░░░███╗███████╗███╗░░██╗████████╗██╗░░░██╗███╗░░░███╗
+████╗░████║██╔══██╗████╗░████║██╔════╝████╗░██║╚══██╔══╝██║░░░██║████╗░████║
+██╔████╔██║██║░░██║██╔████╔██║█████╗░░██╔██╗██║░░░██║░░░██║░░░██║██╔████╔██║
+██║╚██╔╝██║██║░░██║██║╚██╔╝██║██╔══╝░░██║╚████║░░░██║░░░██║░░░██║██║╚██╔╝██║
+██║░╚═╝░██║╚█████╔╝██║░╚═╝░██║███████╗██║░╚███║░░░██║░░░╚██████╔╝██║░╚═╝░██║
+╚═╝░░░░░╚═╝░╚════╝░╚═╝░░░░░╚═╝╚══════╝╚═╝░░╚══╝░░░╚═╝░░░░╚═════╝░╚═╝░░░░░╚═╝
+
+██╗░░██╗███████╗████████╗██████╗░███████╗██╗░░██╗
+██║░░██║██╔════╝╚══██╔══╝██╔══██╗██╔════╝╚██╗██╔╝
+███████║█████╗░░░░░██║░░░██║░░██║█████╗░░░╚███╔╝░
+██╔══██║██╔══╝░░░░░██║░░░██║░░██║██╔══╝░░░██╔██╗░
+██║░░██║██║░░░░░░░░██║░░░██████╔╝███████╗██╔╝╚██╗
+╚═╝░░╚═╝╚═╝░░░░░░░░╚═╝░░░╚═════╝░╚══════╝╚═╝░░╚═╝
+*/
+
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 interface IERC20 {
     function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
     function transfer(address recipient, uint256 amount) external returns (bool);
+}
+
+interface PriceOracle {
+    function calculatePrice() external view returns (uint256);
 }
 
 contract CLOBOrderBookDEX {
@@ -34,10 +54,12 @@ contract CLOBOrderBookDEX {
     mapping(uint256 => Order) public orders;
     uint256[] private buyOrderIds;
     uint256[] private sellOrderIds;
+    PriceOracle public priceOracle;
+    address private owner;
     Trade[] private trades; // Array to store trade data for VWAP calculation
     uint256 public vwapPrice; // VWAP price
+    uint256 public currentVWAP;
 
-    address private owner;
 
     event OrderPlaced(uint256 orderId, address trader, uint256 amountToken1, uint256 amountToken2, bool isBuyOrder);
     event TradeExecuted(uint256 buyOrderId, uint256 sellOrderId, uint256 tradedAmountToken1, uint256 tradedAmountToken2);
@@ -49,6 +71,7 @@ contract CLOBOrderBookDEX {
     event OrderCancelled(uint256 orderId);
     event VWAPUpdated(uint256 newVWAP);
 
+
     constructor(address _token1, address _token2) {
         token1 = _token1;
         token2 = _token2;
@@ -58,6 +81,10 @@ contract CLOBOrderBookDEX {
     modifier onlyOwner() {
         require(msg.sender == owner, "Not authorized");
         _;
+    }
+
+    function setPriceOracle(address oracleAddress) external onlyOwner {
+        priceOracle = PriceOracle(oracleAddress);
     }
 
     function placeOrder(uint256 amountToken1, uint256 amountToken2, bool isBuyOrder) external {
@@ -88,7 +115,7 @@ contract CLOBOrderBookDEX {
         matchOrders();
     }
 
-        function placeStopOrder(uint256 amountToken1, uint256 amountToken2, uint256 stopPrice, bool isBuyOrder) external {
+    function placeStopOrder(uint256 amountToken1, uint256 amountToken2, uint256 stopPrice, bool isBuyOrder) external {
         uint256 orderId = nextOrderId++;
         orders[orderId] = Order(msg.sender, amountToken1, amountToken2, isBuyOrder, false, block.timestamp, 0, stopPrice, 0, 0, 0, 0);
 
@@ -141,7 +168,7 @@ contract CLOBOrderBookDEX {
         removeOrder(orderId, order.isBuyOrder);
     }
 
-        function getBestBid() public view returns (uint256 bestBidPrice) {
+    function getBestBid() public view returns (uint256 bestBidPrice) {
         if (buyOrderIds.length == 0) return 0;
         Order storage bestBid = orders[buyOrderIds[buyOrderIds.length - 1]];
         bestBidPrice = safeDiv(bestBid.amountToken2, bestBid.amountToken1);
@@ -161,9 +188,6 @@ contract CLOBOrderBookDEX {
         require(orderId < nextOrderId, "Invalid order ID");
         return orders[orderId];
     }
-
-    // VWAP Implementation
-
 
     function updateVWAP() internal {
         uint256 volumeWeightedSum = 0;
@@ -185,7 +209,98 @@ contract CLOBOrderBookDEX {
         }
     }
 
-    uint256 public currentVWAP;
+    function triggerUpdateOrderStates() external onlyOwner {
+        uint256 currentMarketPrice = priceOracle.calculatePrice();
+        updateOrderStates(currentMarketPrice);
+        activateStopOrders(currentMarketPrice);
+    }
+
+    function updateOrderStates(uint256 currentMarketPrice) internal {
+        for (uint256 i = 1; i < nextOrderId; i++) {
+            Order storage order = orders[i];
+            if (!order.isActive && order.stopPrice > 0) {
+                if ((order.isBuyOrder && currentMarketPrice >= order.stopPrice) ||
+                    (!order.isBuyOrder && currentMarketPrice <= order.stopPrice)) {
+                    order.isActive = true;
+                    insertSorted(order.isBuyOrder ? buyOrderIds : sellOrderIds, i, order.isBuyOrder);
+                    emit OrderActivated(i);
+                }
+            }
+
+            if (order.trailingDistance > 0) {
+                updateTrailingStopOrder(order, i, currentMarketPrice);
+            }
+        }
+    }
+
+    function activateStopOrders(uint256 currentMarketPrice) public {
+    // Obtain the current market price from the price oracle
+    for (uint256 i = 1; i < nextOrderId; i++) {
+        Order storage order = orders[i];
+        // Check if the order is a stop order and not already active
+        if (!order.isActive && order.stopPrice > 0) {
+            // Activate buy stop orders if the market price is above the stop price
+            // Activate sell stop orders if the market price is below the stop price
+            if ((order.isBuyOrder && currentMarketPrice >= order.stopPrice) ||
+                (!order.isBuyOrder && currentMarketPrice <= order.stopPrice)) {
+                order.isActive = true;
+                insertSorted(order.isBuyOrder ? buyOrderIds : sellOrderIds, i, order.isBuyOrder);
+                emit OrderActivated(i);  // Emit an event indicating the order is activated
+            }
+        }
+    }
+    }
+
+    function updateTrailingStopOrder(Order storage order, uint256 orderId, uint256 currentMarketPrice) internal {
+        if (order.isBuyOrder) {
+            if (currentMarketPrice > order.referencePrice) {
+                order.referencePrice = currentMarketPrice;
+            } else if (currentMarketPrice <= order.referencePrice - order.trailingDistance) {
+                order.isActive = true;
+                insertSorted(buyOrderIds, orderId, true);
+                emit OrderActivated(orderId);
+            }
+        } else {
+            if (currentMarketPrice < order.referencePrice) {
+                order.referencePrice = currentMarketPrice;
+            } else if (currentMarketPrice >= order.referencePrice + order.trailingDistance) {
+                order.isActive = true;
+                insertSorted(sellOrderIds, orderId, false);
+                emit OrderActivated(orderId);
+            }
+        }
+    }
+
+    function matchOrders() internal {
+        uint256 i = 0;
+        uint256 j = 0;
+
+        while (i < buyOrderIds.length && j < sellOrderIds.length) {
+            Order storage buyOrder = orders[buyOrderIds[i]];
+            Order storage sellOrder = orders[sellOrderIds[j]];
+
+            if (!buyOrder.isActive || !sellOrder.isActive) {
+                if (!buyOrder.isActive) i++;
+                if (!sellOrder.isActive) j++;
+                continue;
+            }
+
+            if (isMatch(buyOrder, sellOrder)) {
+                executeTrade(buyOrderIds[i], sellOrderIds[j]);
+                if (!buyOrder.isActive) i++;
+                if (!sellOrder.isActive) j++;
+            } else {
+                break; // No more matches possible
+            }
+        }
+    }
+
+    function isMatch(Order storage buyOrder, Order storage sellOrder) internal view returns (bool) {
+        uint256 buyPricePerUnit = safeDiv(buyOrder.amountToken2, buyOrder.amountToken1);
+        uint256 sellPricePerUnit = safeDiv(sellOrder.amountToken2, sellOrder.amountToken1);
+
+        return (buyPricePerUnit >= sellOrder.limitPrice) && (sellPricePerUnit <= buyOrder.limitPrice);
+    }
 
     function executeTrade(uint256 buyOrderId, uint256 sellOrderId) internal {
         Order storage buyOrder = orders[buyOrderId];
@@ -230,7 +345,7 @@ contract CLOBOrderBookDEX {
         }
     }
 
-        function calculateTradeAmount(Order storage buyOrder, Order storage sellOrder) internal view returns (uint256) {
+    function calculateTradeAmount(Order storage buyOrder, Order storage sellOrder) internal view returns (uint256) {
         uint256 minTradeAmountToken1 = min(buyOrder.amountToken1, sellOrder.amountToken1);
 
         if (buyOrder.limitPrice > 0 && sellOrder.limitPrice > 0) {
@@ -283,57 +398,59 @@ contract CLOBOrderBookDEX {
     }
 
     function insertSorted(uint256[] storage orderArray, uint256 orderId, bool isBuyOrder) internal {
-        if (orderArray.length == 0) {
+    if (orderArray.length == 0) {
+        orderArray.push(orderId);
+        return;
+    }
+
+    Order memory newOrder = orders[orderId];
+    uint256 newOrderPrice = safeDiv(newOrder.amountToken2, newOrder.amountToken1);
+
+    uint256 low = 0;
+    uint256 high = orderArray.length - 1;
+
+    while (low < high) {
+        uint256 mid = low + (high - low) / 2;
+        Order storage midOrder = orders[orderArray[mid]];
+        uint256 midOrderPrice = safeDiv(midOrder.amountToken2, midOrder.amountToken1);
+
+        if (isBuyOrder) {
+            if (newOrderPrice > midOrderPrice || 
+                (newOrderPrice == midOrderPrice && newOrder.timestamp < midOrder.timestamp)) {
+                high = mid;
+            } else {
+                low = mid + 1;
+            }
+        } else {
+            if (newOrderPrice < midOrderPrice || 
+                (newOrderPrice == midOrderPrice && newOrder.timestamp < midOrder.timestamp)) {
+                high = mid;
+            } else {
+                low = mid + 1;
+            }
+        }
+    }
+
+    // Check if the new order should be inserted at the end of the array
+    if (low == orderArray.length - 1) {
+        Order storage lastOrder = orders[orderArray[low]];
+        uint256 lastOrderPrice = safeDiv(lastOrder.amountToken2, lastOrder.amountToken1);
+
+        if ((isBuyOrder && (newOrderPrice > lastOrderPrice || 
+            (newOrderPrice == lastOrderPrice && newOrder.timestamp < lastOrder.timestamp))) || 
+            (!isBuyOrder && (newOrderPrice < lastOrderPrice || 
+            (newOrderPrice == lastOrderPrice && newOrder.timestamp < lastOrder.timestamp)))) {
             orderArray.push(orderId);
             return;
         }
-
-        Order memory newOrder = orders[orderId];
-        uint256 newOrderPrice = safeDiv(newOrder.amountToken2, newOrder.amountToken1);
-
-        uint256 low = 0;
-        uint256 high = orderArray.length - 1;
-
-        while (low < high) {
-            uint256 mid = low + (high - low) / 2;
-            Order storage midOrder = orders[orderArray[mid]];
-            uint256 midOrderPrice = safeDiv(midOrder.amountToken2, midOrder.amountToken1);
-
-            if (isBuyOrder) {
-                if (newOrderPrice > midOrderPrice || 
-                    (newOrderPrice == midOrderPrice && newOrder.timestamp < midOrder.timestamp)) {
-                    high = mid;
-                } else {
-                    low = mid + 1;
-                }
-            } else {
-                if (newOrderPrice < midOrderPrice || 
-                    (newOrderPrice == midOrderPrice && newOrder.timestamp < midOrder.timestamp)) {
-                    high = mid;
-                } else {
-                    low = mid + 1;
-                }
-            }
-        }
-
-        if (low == orderArray.length - 1) {
-            Order storage lastOrder = orders[orderArray[low]];
-            uint256 lastOrderPrice = safeDiv(lastOrder.amountToken2, lastOrder.amountToken1);
-
-            if ((isBuyOrder && (newOrderPrice > lastOrderPrice || 
-                (newOrderPrice == lastOrderPrice && newOrder.timestamp < lastOrder.timestamp))) || 
-                (!isBuyOrder && (newOrderPrice < lastOrderPrice || 
-                (newOrderPrice == lastOrderPrice && newOrder.timestamp < lastOrder.timestamp)))) {
-                orderArray.push(orderId);
-                return;
-            }
-        }
-
-        orderArray.push(orderArray[orderArray.length - 1]);
-        for (uint256 i = orderArray.length - 2; i > low; i--) {
-            orderArray[i] = orderArray[i - 1];
-        }
-        orderArray[low] = orderId;
     }
+
+    // Shift elements to the right and insert the new order
+    orderArray.push(orderArray[orderArray.length - 1]); // Duplicate the last element
+    for (uint256 i = orderArray.length - 2; i > low; i--) {
+        orderArray[i] = orderArray[i - 1];
+    }
+    orderArray[low] = orderId;
+}
 
 }
