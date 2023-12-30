@@ -72,8 +72,6 @@ Tentative Supported Tokens:
 
 ## Order Types
 
-Status: To be Implemented.
-
 HFTDEX currently supports:
 ```
 1. Market Orders
